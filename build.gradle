@@ -91,7 +91,7 @@ allprojects {
     }
 
     test {
-        useJUnitPlatform()
+        //useJUnitPlatform()
     }
 
     processResources {

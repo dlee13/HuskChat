@@ -115,7 +115,7 @@ public class SpicordHook implements DiscordHook {
         @NotNull
         @Override
         public String getServerName() {
-            return String.format("#%s", context.getChannel().getName());
+            return "D";
         }
 
         @Override
@@ -198,30 +198,19 @@ public class SpicordHook implements DiscordHook {
         }
 
         private void dispatchMessage(@NotNull ChatMessage message, @NotNull GuildMessageChannel channel) {
-            final Format format = settings.getFormatStyle();
+            if (message.getMessage().contains("https://discord.gg")) {
+                return;
+            }
+            final String content = String.format("[%s] **%s** » %s",
+                    message.getSender().getServerName(),
+                    message.getSender().getName(),
+                    message.getMessage());
             channel.sendMessage(new MessageCreateBuilder()
                     // Disable mentions
                     .setAllowedMentions(List.of())
 
-                    // Embedded formatting
-                    .setEmbeds(format == Format.EMBEDDED ? List.of(new EmbedBuilder()
-                            .setDescription(message.getMessage())
-                            .setColor(0x00fb9a)
-                            .setFooter(
-                                    String.format("%s • %s",
-                                            message.getSender().getName(),
-                                            message.getSender().getServerName()
-                                    ),
-                                    String.format("https://minotar.net/avatar/%s/64",
-                                            message.getSender().getUuid()
-                                    )
-                            )
-                            .setTimestamp(OffsetDateTime.now())
-                            .build()) : List.of())
-
                     // Inline formatting
-                    .setContent(format == Format.INLINE ? String.format("### %s\n%s",
-                            message.getSender().getName(), message.getMessage()) : null)
+                    .setContent(content)
 
                     .build()
             ).queue();
@@ -251,7 +240,7 @@ public class SpicordHook implements DiscordHook {
             new ChatMessage(
                     serverChannel.get(),
                     new SpicordOnlineUser(plugin, event.getAuthor(), event.getMessage()),
-                    event.getMessage().getContentRaw(),
+                    String.format("&#7289da&%s", event.getMessage().getContentRaw()),
                     plugin
             ).dispatch();
         }
